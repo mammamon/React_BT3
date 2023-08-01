@@ -1,8 +1,6 @@
 import React from 'react'
 
 const ProductDetail = ({ productDetail }) => {
-    console.log('productDetail: ', productDetail)
-    // const { productDetail } = props
     return (
         <div
             className="modal fade"

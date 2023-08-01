@@ -1,56 +1,51 @@
-import React, { useState } from 'react'
-import prdList from './data.json'
-import ProductList from './ProductList'
-import ProductDetail from './ProductDetail'
-import Cart from './Cart'
+import React, { useState, useReducer } from 'react';
+import data from './data.json';
+import ProductList from './ProductList';
+import ProductDetail from './ProductDetail';
+import Cart from './Cart';
+
+const cartReducer = (state, action) => {
+    let index;
+    switch (action.type) {
+        case 'ADD_TO_CART':
+            index = state.findIndex((item) => item.id === action.product.id);
+            if (index !== -1) {
+                state[index].cartQuantity += 1;
+            } else {
+                state.push({ ...action.product, cartQuantity: 1 });
+            }
+            return [...state];
+        case 'UPDATE_CART_QUANTITY':
+            index = state.findIndex((item) => item.id === action.id);
+            state[index].cartQuantity = state[index].cartQuantity + action.quantity || 1;
+            return [...state];
+        case 'DELETE_FROM_CART':
+            return state.filter((item) => item.id !== action.id);
+        default:
+            return state;
+    }
+};
+
 
 const ShoeStore = () => {
-    console.log({ prdList })
-    const [productDetail, setProductDetail] = useState(prdList[0])
-
-    const [carts, setCarts] = useState([]) // tham chiếu #123
-    console.log('carts: ', carts)
+    const [productDetail, setProductDetail] = useState(data[0]);
+    const [carts, dispatch] = useReducer(cartReducer, []);
 
     const handleProductDetail = (product) => {
-        setProductDetail(product)
-    }
+        setProductDetail(product);
+    };
 
     const handleCarts = (product) => {
-        console.log('product: ', product)
-        // setCarts(data)
-        setCarts((currentState) => {
-            //#123
-            //Kiểm tra trong carts đã tồn tại sản phẩm hay chưa
-            const index = currentState.findIndex((item) => item.id === product.id)
-
-            if (index !== -1) {
-                //SP đã tồn tại trong carts => tăng số lượng của sp đó lên
-                currentState[index].cartQuantity += 1
-            } else {
-                currentState.push({ ...product, cartQuantity: 1 })
-            }
-            return [...currentState]
-        })
-    }
+        dispatch({ type: 'ADD_TO_CART', product });
+    };
 
     const handleCartQuantity = (id, quantity) => {
-        // quantiy: +1 => button +
-        // quantity: -1:  => button -
-        setCarts((currentState) => {
-            // Tìm kiếm sản phẩm đang muốn tăng giảm số lượng
-            const index = currentState.findIndex((item) => item.id === id)
-
-            currentState[index].cartQuantity = currentState[index].cartQuantity + quantity || 1
-
-            return [...currentState]
-        })
-    }
+        dispatch({ type: 'UPDATE_CART_QUANTITY', id, quantity });
+    };
 
     const handleDeleteCart = (id) => {
-        setCarts((currentState) => {
-            return currentState.filter((item) => item.id !== id)
-        })
-    }
+        dispatch({ type: 'DELETE_FROM_CART', id });
+    };
 
     return (
         <div className="container mt-5">
@@ -65,21 +60,20 @@ const ShoeStore = () => {
                 </button>
             </div>
             <ProductList
-                prdList={prdList}
+                data={data}
                 handleProductDetail={handleProductDetail}
                 handleCarts={handleCarts}
             />
-            {/* Modal detail */}
+
             <ProductDetail productDetail={productDetail} />
 
-            {/* Modal Giỏ hàng */}
             <Cart
                 carts={carts}
                 handleCartQuantity={handleCartQuantity}
                 handleDeleteCart={handleDeleteCart}
             />
         </div>
-    )
-}
+    );
+};
 
-export default ShoeStore
+export default ShoeStore;
