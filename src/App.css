@@ -1,0 +1,16 @@
+.menu {
+    height: 500px;
+}
+.navbar-nav {
+    width: 100%;
+}
+.nav-item {
+    padding-left: 8px;
+}
+
+ul>li:hover {
+    border: 1px solid #31d2f2;
+}
+input[type="number"] {
+    width: 75px;
+}

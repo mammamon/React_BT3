@@ -10,21 +10,27 @@ const cartReducer = (state, action) => {
         case 'ADD_TO_CART':
             index = state.findIndex((item) => item.id === action.product.id);
             if (index !== -1) {
-                state[index].cartQuantity += 1;
+                return state.map((item) =>
+                    item.id === action.product.id
+                        ? { ...item, cartQuantity: item.cartQuantity + 1 }
+                        : item
+                );
             } else {
-                state.push({ ...action.product, cartQuantity: 1 });
+                return [...state, { ...action.product, cartQuantity: 1 }];
             }
-            return [...state];
         case 'UPDATE_CART_QUANTITY':
-            index = state.findIndex((item) => item.id === action.id);
-            state[index].cartQuantity = state[index].cartQuantity + action.quantity || 1;
-            return [...state];
+            return state.map((item) =>
+                item.id === action.id ? { ...item, cartQuantity: action.quantity } : item
+            );
         case 'DELETE_FROM_CART':
             return state.filter((item) => item.id !== action.id);
         default:
             return state;
     }
 };
+
+
+
 
 
 const ShoeStore = () => {
@@ -42,36 +48,48 @@ const ShoeStore = () => {
     const handleCartQuantity = (id, quantity) => {
         dispatch({ type: 'UPDATE_CART_QUANTITY', id, quantity });
     };
-
     const handleDeleteCart = (id) => {
         dispatch({ type: 'DELETE_FROM_CART', id });
     };
 
     return (
-        <div className="container mt-5">
-            <div className="d-flex justify-content-between">
-                <h1>ShoeStore</h1>
-                <button
-                    className="btn btn-outline-success"
-                    data-bs-toggle="modal"
-                    data-bs-target="#carts"
-                >
-                    Cart
-                </button>
+
+        <div className="container mt-5 d-flex">
+            <div className="menu col-3 d-flex justify-content-center align-items-center me-4">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Shop</a>
+                    </li>
+                </ul>
             </div>
-            <ProductList
-                data={data}
-                handleProductDetail={handleProductDetail}
-                handleCarts={handleCarts}
-            />
+            <div classNAme="col-9">
+                <div className="d-flex justify-content-center">
+                    <h1 className='m-auto'>Shoe Shop</h1>
+                    <button
+                        className="btn btn-outline-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#carts"
+                    >
+                        Giỏ hàng
+                    </button>
+                </div>
+                <ProductList
+                    data={data}
+                    handleProductDetail={handleProductDetail}
+                    handleCarts={handleCarts}
+                />
 
-            <ProductDetail productDetail={productDetail} />
+                <ProductDetail productDetail={productDetail} />
 
-            <Cart
-                carts={carts}
-                handleCartQuantity={handleCartQuantity}
-                handleDeleteCart={handleDeleteCart}
-            />
+                <Cart
+                    carts={carts}
+                    handleCartQuantity={handleCartQuantity}
+                    handleDeleteCart={handleDeleteCart}
+                />
+            </div>
         </div>
     );
 };
